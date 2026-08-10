@@ -362,6 +362,29 @@ void SortingRendererClass::Insert_To_Sorting_Pool(SortingNodeStruct* state)
 // ----------------------------------------------------------------------------
 //static unsigned prevLight = 0xffffffff;
 
+// TheSuperHackers @tweak Exact equality of the render state that Apply_Render_State touches.
+// Used to merge z-adjacent sorted runs into one draw call when their state is identical, which
+// collapses the thousands of tiny draw calls that depth-interleaved particle systems produce.
+static bool Equal_Sorting_State(const RenderStateStruct& a, const RenderStateStruct& b)
+{
+	if (a.shader.Get_Bits() != b.shader.Get_Bits()) return false;
+	if (a.material != b.material) return false;
+	const int maxTextures = DX8Wrapper::Get_Current_Caps()->Get_Max_Textures_Per_Pass();
+	for (int t = 0; t < maxTextures; ++t) {
+		if (a.Textures[t] != b.Textures[t]) return false;
+	}
+	if (memcmp(&a.world, &b.world, sizeof(D3DMATRIX)) != 0) return false;
+	if (memcmp(&a.view, &b.view, sizeof(D3DMATRIX)) != 0) return false;
+	if (a.material != NULL && a.material->Get_Lighting()) {
+		for (int k = 0; k < 4; ++k) {
+			if (a.LightEnable[k] != b.LightEnable[k]) return false;
+			if (!a.LightEnable[k]) break; // cascade mirrors Apply_Render_State
+			if (memcmp(&a.Lights[k], &b.Lights[k], sizeof(D3DLIGHT8)) != 0) return false;
+		}
+	}
+	return true;
+}
+
 static bool s_sortingTransformsValid = false;
 
 static void Apply_Render_State(RenderStateStruct& render_state)
@@ -569,20 +592,37 @@ void SortingRendererClass::Flush_Sorting_Pool()
 		unsigned count_to_render=1;
 		unsigned start_index=0;
 		unsigned node_id=tis[chunkOffset].idx;
+		// TheSuperHackers @tweak Track the union vertex range of the current run so that
+		// z-adjacent nodes with identical render state merge into a single draw call.
+		unsigned runMin=overlapping_nodes[node_id]->min_vertex_index;
+		unsigned runEnd=runMin+overlapping_nodes[node_id]->vertex_count;
 		for (unsigned i=chunkOffset + 1;i<chunkEnd;++i) {
 			if (node_id!=tis[i].idx) {
+				SortingNodeStruct* nextNode=overlapping_nodes[tis[i].idx];
 				SortingNodeStruct* state=overlapping_nodes[node_id];
-				Apply_Render_State(state->sorting_state);
 
-				DX8Wrapper::Draw_Triangles(
-					start_index*3,
-					count_to_render,
-					state->min_vertex_index,
-					state->vertex_count);
+				if (Equal_Sorting_State(state->sorting_state, nextNode->sorting_state)) {
+					// Identical state: extend the current run instead of breaking it.
+					const unsigned nextMin=nextNode->min_vertex_index;
+					const unsigned nextEnd=nextMin+nextNode->vertex_count;
+					if (nextMin<runMin) runMin=nextMin;
+					if (nextEnd>runEnd) runEnd=nextEnd;
+				}
+				else {
+					Apply_Render_State(state->sorting_state);
 
-				count_to_render=0;
-				start_index=i - chunkOffset;
-				node_id=tis[i].idx;
+					DX8Wrapper::Draw_Triangles(
+						start_index*3,
+						count_to_render,
+						runMin,
+						runEnd-runMin);
+
+					count_to_render=0;
+					start_index=i - chunkOffset;
+					node_id=tis[i].idx;
+					runMin=nextNode->min_vertex_index;
+					runEnd=runMin+nextNode->vertex_count;
+				}
 			}
 			count_to_render++;	//keep track of number of polygons of same kind
 		}
@@ -595,8 +635,8 @@ void SortingRendererClass::Flush_Sorting_Pool()
 			DX8Wrapper::Draw_Triangles(
 				start_index*3,
 				count_to_render,
-				state->min_vertex_index,
-				state->vertex_count);
+				runMin,
+				runEnd-runMin);
 		}
 
 		chunkOffset += chunkCount;

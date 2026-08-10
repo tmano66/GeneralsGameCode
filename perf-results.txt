@@ -13,3 +13,6 @@
 2026-08-10 00:12:53  round4-mat-xform-dedup(menu)  avg=6729.9 min=6703.2 max=6778.6 samples=17
 2026-08-10 00:14:01  round4-mat-xform-dedup(replay)  avg=817.1 min=547.0 max=2014.8 samples=17
 2026-08-10 00:14:59  round4-mat-xform-dedup(replayzoom)  avg=767.0 min=758.5 max=769.4 samples=14
+2026-08-10 00:17:45  round5-particle-merge(menu)  avg=6758.4 min=6734.3 max=6792.0 samples=17
+2026-08-10 00:18:38  round5-particle-merge(replay)  avg=817.7 min=535.7 max=2002.0 samples=17
+2026-08-10 00:19:35  round5-particle-merge(replayzoom)  avg=767.0 min=754.1 max=770.6 samples=14
