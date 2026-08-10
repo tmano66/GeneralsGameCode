@@ -986,9 +986,10 @@ bool DX8Wrapper::Set_Render_Device(int dev, int width, int height, int bits, int
 	_PresentParameters.EnableAutoDepthStencil = TRUE;				// Driver will attempt to match Z-buffer depth
 	_PresentParameters.Flags=0;											// We're not going to lock the backbuffer
 
-	// TheSuperHackers @feature Disables VSync in fullscreen when requested. Windowed mode keeps
-	// D3DPRESENT_INTERVAL_DEFAULT as required by Direct3D 8.
-	_PresentParameters.FullScreen_PresentationInterval = (IsWindowed || EnableVSync) ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE;
+	// TheSuperHackers @feature Disables VSync when requested. Direct3D 8 formally requires
+	// D3DPRESENT_INTERVAL_DEFAULT for windowed devices, but Wine and modern drivers accept
+	// D3DPRESENT_INTERVAL_IMMEDIATE in windowed mode as well.
+	_PresentParameters.FullScreen_PresentationInterval = EnableVSync ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE;
 	_PresentParameters.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
 	/*

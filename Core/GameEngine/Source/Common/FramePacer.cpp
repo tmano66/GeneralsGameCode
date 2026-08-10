@@ -56,6 +56,29 @@ void FramePacer::update()
 	// with higher resolution counters to cap the frame rate more accurately to the desired limit.
 	const UnsignedInt maxFps = getActualFramesPerSecondLimit();// allowFpsLimit ? getFramesPerSecondLimit() : RenderFpsPreset::UncappedFpsValue;
 	m_updateTime = m_frameRateLimit.wait(maxFps);
+
+	// TheSuperHackers @feature Benchmark instrumentation: when the RTS_FPS_LOG environment
+	// variable names a file, append the average frame rate roughly every two seconds.
+	// Costs one getenv on the first frame and near nothing after.
+	static const char* s_fpsLogFile = getenv("RTS_FPS_LOG");
+	if (s_fpsLogFile != NULL)
+	{
+		static Real s_accumTime = 0.0f;
+		static Int s_accumFrames = 0;
+		s_accumTime += m_updateTime;
+		++s_accumFrames;
+		if (s_accumTime >= 2.0f)
+		{
+			FILE* f = fopen(s_fpsLogFile, "a");
+			if (f != NULL)
+			{
+				fprintf(f, "%.1f\n", (Real)s_accumFrames / s_accumTime);
+				fclose(f);
+			}
+			s_accumTime = 0.0f;
+			s_accumFrames = 0;
+		}
+	}
 }
 
 void FramePacer::reset()
