@@ -362,6 +362,8 @@ void SortingRendererClass::Insert_To_Sorting_Pool(SortingNodeStruct* state)
 // ----------------------------------------------------------------------------
 //static unsigned prevLight = 0xffffffff;
 
+static bool s_sortingTransformsValid = false;
+
 static void Apply_Render_State(RenderStateStruct& render_state)
 {
 	DX8Wrapper::Set_Shader(render_state.shader);
@@ -373,8 +375,22 @@ static void Apply_Render_State(RenderStateStruct& render_state)
 		DX8Wrapper::Set_Texture(i,render_state.Textures[i]);
 	}
 
-	DX8Wrapper::_Set_DX8_Transform(D3DTS_WORLD,render_state.world);
-	DX8Wrapper::_Set_DX8_Transform(D3DTS_VIEW,render_state.view);
+	// TheSuperHackers @tweak Skip redundant device SetTransform calls between sorted runs.
+	// Scoped to this file: nothing else touches transforms between the draws of a flush.
+	{
+		static D3DMATRIX s_lastWorld;
+		static D3DMATRIX s_lastView;
+		if (!s_sortingTransformsValid
+			|| memcmp(&s_lastWorld, &render_state.world, sizeof(D3DMATRIX)) != 0
+			|| memcmp(&s_lastView, &render_state.view, sizeof(D3DMATRIX)) != 0)
+		{
+			DX8Wrapper::_Set_DX8_Transform(D3DTS_WORLD,render_state.world);
+			DX8Wrapper::_Set_DX8_Transform(D3DTS_VIEW,render_state.view);
+			s_lastWorld = render_state.world;
+			s_lastView = render_state.view;
+			s_sortingTransformsValid = true;
+		}
+	}
 
 
 	if (!render_state.material->Get_Lighting())
@@ -548,6 +564,7 @@ void SortingRendererClass::Flush_Sorting_Pool()
 		DX8Wrapper::Set_Vertex_Buffer(dyn_vb_access); // Override with this buffer (do something to prevent need for this!)
 
 		DX8Wrapper::Apply_Render_State_Changes();
+		s_sortingTransformsValid = false;
 
 		unsigned count_to_render=1;
 		unsigned start_index=0;

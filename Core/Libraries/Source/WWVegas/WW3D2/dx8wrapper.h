@@ -311,6 +311,7 @@ public:
 	static void Release_Render_State();
 
 	static void Set_DX8_Material(const D3DMATERIAL8* mat);
+	static void Set_DX8_Material_Deduped(const D3DMATERIAL8* mat);
 
 	static void Set_Gamma(float gamma,float bright,float contrast,bool calibrate=true,bool uselimit=true);
 

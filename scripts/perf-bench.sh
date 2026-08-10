@@ -15,6 +15,11 @@ LOG="$(mktemp /tmp/fpsbench.XXXX.log)"
 RESULTS="/home/tim/repos/GeneralsGameCode/perf-results.txt"
 
 pkill -f "[g]eneralszh.exe" 2>/dev/null && sleep 3 || true
+# A wineserver lingering after a killed run can hold the single-instance mutex
+# and make every new launch exit instantly. Clear it when no game is running.
+if ! pgrep -f "[g]eneralszh.exe" >/dev/null; then
+    pkill -f "[w]ineserver" 2>/dev/null && sleep 4 || true
+fi
 
 # Lift the render FPS cap for the duration of the benchmark, restore on exit
 OPTIONS_INI="$PREFIX/pfx/drive_c/users/steamuser/Documents/Command and Conquer Generals Zero Hour Data/Options.ini"

@@ -9,3 +9,7 @@
 2026-08-09 23:29:51  round3-culling-lights(menu)  avg=6734.3 min=6680.3 max=6794.5 samples=17
 2026-08-09 23:30:44  round3-culling-lights(replay)  avg=813.9 min=586.9 max=1759.4 samples=17
 2026-08-09 23:31:41  round3-culling-lights(replayzoom)  avg=764.6 min=760.5 max=766.3 samples=14
+2026-08-10 00:10:33  round4-mat-xform-dedup(menu)  avg=6690.4 min=6533.3 max=6741.7 samples=17
+2026-08-10 00:12:53  round4-mat-xform-dedup(menu)  avg=6729.9 min=6703.2 max=6778.6 samples=17
+2026-08-10 00:14:01  round4-mat-xform-dedup(replay)  avg=817.1 min=547.0 max=2014.8 samples=17
+2026-08-10 00:14:59  round4-mat-xform-dedup(replayzoom)  avg=767.0 min=758.5 max=769.4 samples=14

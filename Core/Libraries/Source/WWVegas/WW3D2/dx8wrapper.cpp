@@ -127,6 +127,22 @@ bool DX8Wrapper::EnableVSync = true;
 static D3DLIGHT8 _AppliedLights[4];
 static bool _AppliedLightsValid[4];
 
+// TheSuperHackers @tweak Same dedup for the device material, the only per-draw
+// state without a redundancy check. Consecutive draws re-issue byte-identical
+// SetMaterial calls whenever the ambient light changes between objects.
+static D3DMATERIAL8 _AppliedMaterial;
+static bool _AppliedMaterialValid = false;
+
+void DX8Wrapper::Set_DX8_Material_Deduped(const D3DMATERIAL8* mat)
+{
+	if (!_AppliedMaterialValid || memcmp(&_AppliedMaterial, mat, sizeof(D3DMATERIAL8)) != 0)
+	{
+		_AppliedMaterial = *mat;
+		_AppliedMaterialValid = true;
+		Set_DX8_Material(mat);
+	}
+}
+
 // shader system additions KJM v
 DWORD								DX8Wrapper::Vertex_Shader								= 0;
 DWORD								DX8Wrapper::Pixel_Shader								= 0;
@@ -426,6 +442,7 @@ void DX8Wrapper::Invalidate_Cached_Render_States()
 {
 	for (int lightIndex=0; lightIndex<4; ++lightIndex)
 		_AppliedLightsValid[lightIndex]=false;
+	_AppliedMaterialValid=false;
 
 	render_state_changed=0;
 
