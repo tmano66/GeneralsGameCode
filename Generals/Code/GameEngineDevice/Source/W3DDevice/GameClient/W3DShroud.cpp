@@ -67,6 +67,12 @@
 #define DEFAULT_TERRAIN_SIZE 1024 //assumed size of largest terrain possible (in vertices)
 #define DEFAULT_VISIBLE_TERRAIN 96	//assumed size of visible terrain cells.
 
+// TheSuperHackers @tweak Tracks whether the system memory shroud data changed since the
+// last upload to the video memory texture. The upload previously ran every render frame,
+// re-copying identical full-map data at high frame rates. File scope static is safe because
+// only one shroud instance renders per process and the render path is single threaded.
+static Bool s_srcShroudDirty = TRUE;
+
 //-----------------------------------------------------------------------------
 W3DShroud::W3DShroud()
 {
@@ -174,6 +180,7 @@ void W3DShroud::init(WorldHeightMap *pMap, Real worldCellSizeX, Real worldCellSi
 	res = 0;// just to avoid compiler warnings
 
 	m_srcTextureData=rect.pBits;
+	s_srcShroudDirty = TRUE;
 	m_srcTexturePitch=rect.Pitch;
 
 	//clear entire texture to black
@@ -307,6 +314,7 @@ void W3DShroud::setShroudLevel(Int x, Int y, W3DShroudLevel level, Bool textureO
 
 			UnsignedShort pixel=((blueVal>>4)&0xf) | (((greenVal>>4)&0xf)<<4) | (((redVal>>4)&0xf)<<8) | (((alphaVal>>4)&0xf)<<12);
 			*(UnsignedShort *)((Byte *)m_srcTextureData + x*2 + y*m_srcTexturePitch)=pixel;
+			s_srcShroudDirty = TRUE;
 		}
 		else
 #endif
@@ -328,6 +336,7 @@ void W3DShroud::setShroudLevel(Int x, Int y, W3DShroudLevel level, Bool textureO
 				bluepixel = 255;
 			}
 
+			s_srcShroudDirty = TRUE;
 			UnsignedShort *texel = (UnsignedShort *)((Byte *)m_srcTextureData + x*2 + y*m_srcTexturePitch);
 
 //      For those interested, MLorenzen has this bock commented out until he gets back on Mon, Sept. 30 2002
@@ -391,6 +400,7 @@ void W3DShroud::fillShroudData(W3DShroudLevel level)
 		pixel=( ((bluepixel&0xf8) >> 3) | ((greenpixel&0xfc)<<3) | ((redpixel&0xf8)<<8));
 	}
 
+	s_srcShroudDirty = TRUE;
 	UnsignedShort *ptr=(UnsignedShort *)m_srcTextureData;
 	Int pitch = m_srcTexturePitch >> 1;	//2 bytes per pointer increment
 	for (y=0; y<m_numCellsY; y++)
@@ -449,6 +459,7 @@ void W3DShroud::fillBorderShroudData(W3DShroudLevel level, SurfaceClass* pDestSu
 	}
 
 	//Skip to unused texels within the shroud data
+	s_srcShroudDirty = TRUE;
 	UnsignedShort *ptr=(UnsignedShort *)m_srcTextureData + m_numCellsY*(m_srcTexturePitch >> 1);
 
 	//Fill unused texels with border color
@@ -554,6 +565,7 @@ void W3DShroud::render(CameraClass *cam)
 		///@todo: remove this debug buffer fill.
 		fillShroudData(1.0f);	//force to all shrouded
 
+		s_srcShroudDirty = TRUE;
 		Short *src=(Short *)m_srcTextureData;
 		//fill with some dummy values
 		src[0]=(char)0xff;
@@ -570,6 +582,7 @@ void W3DShroud::render(CameraClass *cam)
 
 		DummyTexture=WW3DAssetManager::Get_Instance()->Get_Texture("shroud1024.tga");
 
+		s_srcShroudDirty = TRUE;
 		Short *dataDest=(Short *)((char *)m_srcTextureData);	//offset to correct row of full sysmem shroud
 		Int pitchDest = m_srcTexturePitch >> 1;	//2 bytes per pixel so divide byte count by 2.
 
@@ -705,10 +718,12 @@ void W3DShroud::render(CameraClass *cam)
 	{	//we need to clear unused parts of the destination texture to a known
 		//color in order to keep map border in the state we want.
 		m_clearDstTexture=FALSE;
+		s_srcShroudDirty=TRUE;
 
 		fillBorderShroudData(m_boderShroudLevel, pDestSurface);
 	}
 
+	if (s_srcShroudDirty)
 	{
 		//USE_PERF_TIMER(shroudCopy)
 		DX8Wrapper::_Copy_DX8_Rects(
@@ -717,6 +732,7 @@ void W3DShroud::render(CameraClass *cam)
 				1,
 				pDestSurface->Peek_D3D_Surface(),
 				&dstPoint);
+		s_srcShroudDirty = FALSE;
 	}
 
 	REF_PTR_RELEASE (pDestSurface);

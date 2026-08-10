@@ -381,29 +381,32 @@ static void Apply_Render_State(RenderStateStruct& render_state)
 		return;	//no point changing lights if they are ignored.
   //prevLight = render_state.lightsHash;
 
+	// TheSuperHackers @tweak Route light changes through the deferred Set_Light funnel so the
+	// applied-light cache in dx8wrapper.cpp sees all traffic and never diverges from the device.
+	// Apply_Render_State_Changes applies these before the next draw call.
 	if (render_state.LightEnable[0]) {
-		DX8Wrapper::Set_DX8_Light(0,&render_state.Lights[0]);
+		DX8Wrapper::Set_Light(0,&render_state.Lights[0]);
 		if (render_state.LightEnable[1]) {
-			DX8Wrapper::Set_DX8_Light(1,&render_state.Lights[1]);
+			DX8Wrapper::Set_Light(1,&render_state.Lights[1]);
 			if (render_state.LightEnable[2]) {
-				DX8Wrapper::Set_DX8_Light(2,&render_state.Lights[2]);
+				DX8Wrapper::Set_Light(2,&render_state.Lights[2]);
 				if (render_state.LightEnable[3]) {
-					DX8Wrapper::Set_DX8_Light(3,&render_state.Lights[3]);
+					DX8Wrapper::Set_Light(3,&render_state.Lights[3]);
 				}
 				else {
-					DX8Wrapper::Set_DX8_Light(3,nullptr);
+					DX8Wrapper::Set_Light(3,nullptr);
 				}
 			}
 			else {
-				DX8Wrapper::Set_DX8_Light(2,nullptr);
+				DX8Wrapper::Set_Light(2,nullptr);
 			}
 		}
 		else {
-			DX8Wrapper::Set_DX8_Light(1,nullptr);
+			DX8Wrapper::Set_Light(1,nullptr);
 		}
 	}
 	else {
-		DX8Wrapper::Set_DX8_Light(0,nullptr);
+		DX8Wrapper::Set_Light(0,nullptr);
 	}
 
 

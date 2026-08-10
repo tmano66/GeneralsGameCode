@@ -54,6 +54,8 @@
 #include <WW3D2/texture.h>
 #include <WWMath/tri.h>
 #include <WWMath/colmath.h>
+#include <WWMath/aabox.h>
+#include <WWMath/frustum.h>
 #include <WW3D2/coltest.h>
 #include <WW3D2/rinfo.h>
 #include <WW3D2/camera.h>
@@ -2039,6 +2041,9 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 		for (j=0; j<m_numVBTilesY; j++)
 			for (i=0; i<m_numVBTilesX; i++)
 			{
+				if (isTileOutsideFrustum(rinfo.Camera.Get_Frustum(), i, j))
+					continue;
+
 				DX8Wrapper::Set_Vertex_Buffer(getVertexBufferTile(i, j));
 #ifdef PRE_TRANSFORM_VERTEX
 				if (m_xformedVertexBuffer && pass==0) {
@@ -2150,6 +2155,37 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 
 
 ///Performs additional terrain rendering pass, blending in the black shroud texture.
+
+//-----------------------------------------------------------------------------
+// TheSuperHackers @tweak Frustum culling for whole terrain vertex buffer tiles.
+// The render loops previously issued a draw call for every tile of the draw
+// window in every pass, even for tiles entirely outside the camera frustum.
+// With the zoomed out draw window this is a large number of wasted draw calls.
+// Coordinate math matches the vertex placement in updateVB and the dynamic
+// light tile intersection code above. Z bounds are the provable height range
+// of any terrain vertex (UnsignedByte * MAP_HEIGHT_SCALE). Returns true when
+// the tile is provably outside the frustum. Wrapped tiles draw conservatively.
+//-----------------------------------------------------------------------------
+Bool HeightMapRenderObjClass::isTileOutsideFrustum(const FrustumClass &frustum, Int i, Int j)
+{
+	const Int yMin = j*VERTEX_BUFFER_TILE_LENGTH;
+	const Int yCoordMin = getYWithOrigin(yMin)+m_map->getDrawOrgY()-m_map->getBorderSizeInline();
+	const Int yCoordMax = getYWithOrigin(yMin+VERTEX_BUFFER_TILE_LENGTH-1)+m_map->getDrawOrgY()+1-m_map->getBorderSizeInline();
+	if (yCoordMax <= yCoordMin)
+		return false;
+
+	const Int xMin = i*VERTEX_BUFFER_TILE_LENGTH;
+	const Int xCoordMin = getXWithOrigin(xMin)+m_map->getDrawOrgX()-m_map->getBorderSizeInline();
+	const Int xCoordMax = getXWithOrigin(xMin+VERTEX_BUFFER_TILE_LENGTH-1)+m_map->getDrawOrgX()+1-m_map->getBorderSizeInline();
+	if (xCoordMax <= xCoordMin)
+		return false;
+
+	Vector3 center((xCoordMin+xCoordMax)*0.5f*MAP_XY_FACTOR, (yCoordMin+yCoordMax)*0.5f*MAP_XY_FACTOR, 128.0f*MAP_HEIGHT_SCALE);
+	Vector3 extent((xCoordMax-xCoordMin)*0.5f*MAP_XY_FACTOR, (yCoordMax-yCoordMin)*0.5f*MAP_XY_FACTOR, 128.0f*MAP_HEIGHT_SCALE);
+	AABoxClass box(center, extent);
+	return CollisionMath::Overlap_Test(frustum, box) == CollisionMath::OUTSIDE;
+}
+
 void HeightMapRenderObjClass::renderTerrainPass(CameraClass *pCamera)
 {
 	DX8Wrapper::Set_Transform(D3DTS_WORLD,Matrix3D(true));
@@ -2158,9 +2194,14 @@ void HeightMapRenderObjClass::renderTerrainPass(CameraClass *pCamera)
 
 	DX8Wrapper::Set_Index_Buffer(m_indexBuffer,0);
 
+	const FrustumClass &terrainPassFrustum = pCamera->Get_Frustum();
+
 	for (Int j=0; j<m_numVBTilesY; j++)
 		for (Int i=0; i<m_numVBTilesX; i++)
 		{
+			if (isTileOutsideFrustum(terrainPassFrustum, i, j))
+				continue;
+
 			DX8Wrapper::Set_Vertex_Buffer(getVertexBufferTile(i, j));
 #ifdef PRE_TRANSFORM_VERTEX
 			if (m_xformedVertexBuffer && pass==0) {

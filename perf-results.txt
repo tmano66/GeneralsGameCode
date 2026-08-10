@@ -4,3 +4,8 @@
 2026-08-09 23:10:05  baseline(replay)  avg=60.0 min=59.9 max=60.0 samples=17
 2026-08-09 23:16:37  finding0-terrain(menu)  avg=6662.3 min=6484.6 max=6752.8 samples=17
 2026-08-09 23:17:30  finding0-terrain(replay)  avg=694.2 min=489.4 max=902.7 samples=17
+2026-08-09 23:19:39  round2-model-ui-shroud(menu)  avg=6687.4 min=6627.9 max=6733.3 samples=17
+2026-08-09 23:20:32  round2-model-ui-shroud(replay)  avg=703.5 min=494.7 max=899.9 samples=17
+2026-08-09 23:29:51  round3-culling-lights(menu)  avg=6734.3 min=6680.3 max=6794.5 samples=17
+2026-08-09 23:30:44  round3-culling-lights(replay)  avg=813.9 min=586.9 max=1759.4 samples=17
+2026-08-09 23:31:41  round3-culling-lights(replayzoom)  avg=764.6 min=760.5 max=766.3 samples=14
