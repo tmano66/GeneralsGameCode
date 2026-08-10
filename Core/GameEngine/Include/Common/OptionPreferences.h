@@ -74,6 +74,9 @@ public:
 	Bool getDoubleClickAttackMoveEnabled();
 	Int getJpegQuality() const;
 	Real getScrollFactor();
+	Real getMaxCameraHeightScale() const;
+	Int getFramesPerSecondLimit() const;
+	Bool getVSyncEnabled() const;
 	Bool getDrawScrollAnchor();
 	Bool getMoveScrollAnchor();
 	Bool getCursorCaptureEnabledInWindowedGame() const;

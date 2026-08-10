@@ -2030,6 +2030,16 @@ int WW3D::Get_Texture_Bitdepth()
 	return DX8Wrapper::Get_Texture_Bitdepth();
 }
 
+void WW3D::Set_VSync_Enabled(bool enable)
+{
+	DX8Wrapper::Set_VSync_Enabled(enable);
+}
+
+bool WW3D::Get_VSync_Enabled()
+{
+	return DX8Wrapper::Get_VSync_Enabled();
+}
+
 void WW3D::Set_MSAA_Mode(MultiSampleModeEnum mode)
 {
 	switch (mode) {

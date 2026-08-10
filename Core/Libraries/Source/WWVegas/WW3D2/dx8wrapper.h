@@ -608,6 +608,10 @@ protected:
 	static void Set_MSAA_Mode(D3DMULTISAMPLE_TYPE mode) { MultiSampleAntiAliasing = mode; }
 	static D3DMULTISAMPLE_TYPE Get_MSAA_Mode() { return MultiSampleAntiAliasing; }
 
+	// TheSuperHackers @feature Toggles VSync for the fullscreen presentation. Takes effect on the next device creation or reset.
+	static void Set_VSync_Enabled(bool enable) { EnableVSync = enable; }
+	static bool Get_VSync_Enabled() { return EnableVSync; }
+
 	static void	Set_Swap_Interval(int swap);
 	static int	Get_Swap_Interval();
 	static void Set_Polygon_Mode(int mode);
@@ -647,6 +651,7 @@ protected:
 	static bool								IsWindowed;
 	static D3DFORMAT					DisplayFormat;
 	static D3DMULTISAMPLE_TYPE	MultiSampleAntiAliasing;
+	static bool						EnableVSync;
 
 
 	// shader system updates KJM v
