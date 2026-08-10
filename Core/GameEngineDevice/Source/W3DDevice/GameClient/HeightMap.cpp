@@ -104,6 +104,12 @@ HeightMapRenderObjClass *TheHeightMap = nullptr;
 
 static ShaderClass detailOpaqueShader(SC_DETAIL_BLEND);
 
+// TheSuperHackers @tweak When resizing the terrain draw window, the initial full vertex
+// fill inside initHeightData (which runs without a lights iterator) is deferred, because
+// updateCenter performs the same full update with the real lights immediately afterwards.
+// This halves the cost of a draw window resize. Render path is single threaded.
+static Bool s_deferInitialUpdateBlock = FALSE;
+
 #define DEFAULT_MAX_FRAME_EXTRABLEND_TILES		256	//default number of terrain tiles rendered per call (must fit in one VB)
 #define DEFAULT_MAX_MAP_EXTRABLEND_TILES		2048	//default size of array allocated to hold all map extra blend tiles.
 #define DEFAULT_MAX_BATCH_SHORELINE_TILES		512	//maximum number of terrain tiles rendered per call (must fit in one VB)
@@ -1197,7 +1203,9 @@ void HeightMapRenderObjClass::setTerrainDrawSize(Int width, Int height)
 		m_shroud->reset();
 	//delete m_shroud;
 	//m_shroud = nullptr;
+	s_deferInitialUpdateBlock = TRUE;
 	initHeightData(m_map->getDrawWidth(), m_map->getDrawHeight(), m_map, nullptr, FALSE);
+	s_deferInitialUpdateBlock = FALSE;
 	scheduleFullUpdate();
 }
 
@@ -1333,7 +1341,8 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 		//go with a preset material for now.
 	}
 
-	updateBlock(0,0,x-1,y-1,pMap,pLightsIterator);
+	if (!s_deferInitialUpdateBlock)
+		updateBlock(0,0,x-1,y-1,pMap,pLightsIterator);
 
 	return 0;
 }

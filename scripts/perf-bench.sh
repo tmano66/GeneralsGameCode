@@ -6,6 +6,7 @@
 set -euo pipefail
 
 LABEL="${1:-unlabeled}"
+MODE="${2:-menu}"   # menu | replay
 GAME_DIR="/mnt/md0/steam_games/steamapps/common/Command & Conquer Generals - Zero Hour"
 EXE="$GAME_DIR/generalszh.exe"
 PROTON="/mnt/md0/steam_games/steamapps/common/Proton 9.0 (Beta)/proton"
@@ -26,11 +27,18 @@ restore_limit() {
 }
 trap restore_limit EXIT
 
+# Replay playback runs as client instance 2, which reads Options_Instance02.ini
+cp "$OPTIONS_INI" "$(dirname "$OPTIONS_INI")/Options_Instance02.ini"
+
 cd "$GAME_DIR"
+EXTRA_ARGS=""
+if [ "$MODE" = "replay" ]; then
+    EXTRA_ARGS="-replay benchmark.rep"
+fi
 RTS_FPS_LOG="$LOG" \
 STEAM_COMPAT_CLIENT_INSTALL_PATH="$HOME/.local/share/Steam" \
 STEAM_COMPAT_DATA_PATH="$PREFIX" \
-"$PROTON" run "$EXE" -win >/dev/null 2>&1 &
+"$PROTON" run "$EXE" -win $EXTRA_ARGS >/dev/null 2>&1 &
 GAMEPID=$!
 
 # 50s: ~12s load + intro skip-in, then steady shellmap samples
@@ -48,6 +56,6 @@ fi
 AVG=$(echo "$SAMPLES" | awk '{s+=$1; n++} END {printf "%.1f", s/n}')
 MIN=$(echo "$SAMPLES" | sort -n | head -1)
 MAX=$(echo "$SAMPLES" | sort -n | tail -1)
-LINE="$(date '+%F %T')  $LABEL  avg=$AVG min=$MIN max=$MAX samples=$COUNT"
+LINE="$(date '+%F %T')  $LABEL($MODE)  avg=$AVG min=$MIN max=$MAX samples=$COUNT"
 echo "$LINE" | tee -a "$RESULTS"
 rm -f "$LOG"

@@ -1,3 +1,6 @@
 2026-08-09 22:52:39  baseline-checkpoint2  avg=60.0 min=59.9 max=60.0 samples=17
 2026-08-09 22:54:38  baseline-novsync  avg=200.0 min=200.0 max=200.0 samples=17
 2026-08-09 22:56:02  baseline-uncapped  avg=6672.9 min=6457.8 max=6706.0 samples=17
+2026-08-09 23:10:05  baseline(replay)  avg=60.0 min=59.9 max=60.0 samples=17
+2026-08-09 23:16:37  finding0-terrain(menu)  avg=6662.3 min=6484.6 max=6752.8 samples=17
+2026-08-09 23:17:30  finding0-terrain(replay)  avg=694.2 min=489.4 max=902.7 samples=17
