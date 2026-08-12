@@ -32,6 +32,7 @@
 #include "PreRTS.h"	// This must go first in EVERY cpp file in the GameEngine
 
 #include "Common/AudioSettings.h"
+#include "Common/FrameRateLimit.h"
 #include "Common/GameAudio.h"
 #include "Common/GameLOD.h"
 #include "Common/GlobalData.h"
@@ -267,6 +268,41 @@ Real OptionPreferences::getScrollFactor()
 		factor = 1;
 
 	return factor/100.0f;
+}
+
+Real OptionPreferences::getMaxCameraHeightScale() const
+{
+	OptionPreferences::const_iterator it = find("MaxCameraHeightScale");
+	if (it == end())
+		return 1.0f;
+
+	// TheSuperHackers @feature Scales the maximum camera height (zoom out distance)
+	// relative to the value from GameData.ini. 1.0 is the original limit.
+	const Real scale = (Real)atof(it->second.str());
+	return clamp(1.0f, scale, 10.0f);
+}
+
+Int OptionPreferences::getFramesPerSecondLimit() const
+{
+	OptionPreferences::const_iterator it = find("FramesPerSecondLimit");
+	if (it == end())
+		return TheGlobalData->m_framesPerSecondLimit;
+
+	// TheSuperHackers @feature Overrides the maximum render frame rate from GameData.ini.
+	// The render frame rate is decoupled from the logic rate, so this does not change game speed.
+	const Int fps = atoi(it->second.str());
+	return clamp(30, fps, (Int)RenderFpsPreset::UncappedFpsValue);
+}
+
+Bool OptionPreferences::getVSyncEnabled() const
+{
+	OptionPreferences::const_iterator it = find("VSync");
+	if (it == end())
+		return TRUE;
+
+	// TheSuperHackers @feature Disables VSync when set to no, allowing frame rates
+	// above the display refresh rate in fullscreen.
+	return (stricmp(it->second.str(), "no") != 0);
 }
 
 Bool OptionPreferences::getDrawScrollAnchor()

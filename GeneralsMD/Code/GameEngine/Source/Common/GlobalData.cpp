@@ -854,6 +854,8 @@ GlobalData::GlobalData()
 #endif
 	m_minCameraHeight = 100.0f;
 	m_maxCameraHeight = 300.0f;
+	m_maxCameraHeightScale = 1.0f;
+	m_vsyncEnabled = TRUE;
 	m_terrainHeightAtEdgeOfMap = 0.0f;
 
 	m_unitDamagedThresh = 0.5f;
@@ -1208,6 +1210,9 @@ void GlobalData::parseGameDataDefinition( INI* ini )
 	TheWritableGlobalData->m_doubleClickAttackMove = optionPref.getDoubleClickAttackMoveEnabled();
 	TheWritableGlobalData->m_jpegQuality = optionPref.getJpegQuality();
 	TheWritableGlobalData->m_keyboardScrollFactor = optionPref.getScrollFactor();
+	TheWritableGlobalData->m_maxCameraHeightScale = optionPref.getMaxCameraHeightScale();
+	TheWritableGlobalData->m_framesPerSecondLimit = optionPref.getFramesPerSecondLimit();
+	TheWritableGlobalData->m_vsyncEnabled = optionPref.getVSyncEnabled();
 	TheWritableGlobalData->m_drawScrollAnchor = optionPref.getDrawScrollAnchor();
 	TheWritableGlobalData->m_moveScrollAnchor = optionPref.getMoveScrollAnchor();
 	TheWritableGlobalData->m_defaultIP = optionPref.getLANIPAddress();

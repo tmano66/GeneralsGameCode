@@ -582,6 +582,17 @@ private:
 
 	static GlobalData *m_theOriginal;		///< the original global data instance (no overrides)
 	GlobalData *m_next;									///< next instance (for overrides)
+
+public:
+	// TheSuperHackers @feature User preference scale for the maximum camera height (zoom out limit).
+	// Not parsed from INI. Deliberately placed after the last data member of the class to keep
+	// preceding member offsets stable for incremental builds.
+	Real m_maxCameraHeightScale;
+	// TheSuperHackers @feature User preference for VSync. Not parsed from INI. Kept at the end of
+	// the class to keep preceding member offsets stable for incremental builds.
+	Bool m_vsyncEnabled;
+
+private:
 	virtual GlobalData *newOverride();		/** create a new override, copy data from previous
 																			override, and return it */
 

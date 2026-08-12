@@ -883,8 +883,23 @@ bool GameLogic::onNewGame(MAYBE_UNUSED GameMessage *msg)
 		if (maxFPS < 1 || maxFPS > 1000)
 			maxFPS = TheGlobalData->m_framesPerSecondLimit;
 		DEBUG_LOG(("Setting max FPS limit to %d FPS", maxFPS));
-		TheFramePacer->setFramesPerSecondLimit(maxFPS);
+		// TheSuperHackers @tweak The game speed of the match now applies to the logic time scale
+		// instead of the render frame rate limit, which stays at the user configured maximum.
+		// This keeps the simulation at the chosen game speed while allowing higher render frame
+		// rates. Network matches pace the logic by the network frame rate regardless.
+		const Int renderFps = max(maxFPS, TheGlobalData->m_framesPerSecondLimit);
+		TheFramePacer->setFramesPerSecondLimit(renderFps);
+		TheFramePacer->setLogicTimeScaleFps(maxFPS);
+		TheFramePacer->enableLogicTimeScale(maxFPS < renderFps);
 		TheWritableGlobalData->m_useFpsLimit = true;
+	}
+	else
+	{
+		// TheSuperHackers @tweak Keep the original default game speed when the render frame rate
+		// limit is configured higher than the default logic rate.
+		const Int renderFps = TheFramePacer->getFramesPerSecondLimit();
+		TheFramePacer->setLogicTimeScaleFps(LOGICFRAMES_PER_SECOND);
+		TheFramePacer->enableLogicTimeScale(LOGICFRAMES_PER_SECOND < renderFps);
 	}
 
 	// prepare for new game

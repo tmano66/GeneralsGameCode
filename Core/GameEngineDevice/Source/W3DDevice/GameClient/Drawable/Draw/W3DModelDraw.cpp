@@ -2099,7 +2099,13 @@ void W3DModelDraw::doDrawModule(const Matrix3D* transformMtx)
 	{
 		Matrix3D mtx = *transformMtx;
 		adjustTransformMtx(mtx);
-		m_renderObject->Set_Transform(mtx);
+		// TheSuperHackers @tweak Skip the redundant transform push when the transform has not
+		// changed since the last frame. Set_Transform unconditionally invalidates the whole HLOD
+		// hierarchy and its cached bounding volumes, which is pure waste for the many static
+		// objects on screen. Matrix3D is 12 packed floats, so memcmp is an exact equality check.
+		// Turret rotation and animation invalidate the hierarchy independently.
+		if (memcmp(&mtx, &m_renderObject->Get_Transform_No_Validity_Check(), sizeof(Matrix3D)) != 0)
+			m_renderObject->Set_Transform(mtx);
 	}
 
 	handleClientTurretPositioning();

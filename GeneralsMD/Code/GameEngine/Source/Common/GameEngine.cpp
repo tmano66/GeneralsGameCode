@@ -893,8 +893,74 @@ DECLARE_PERF_TIMER(GameEngine_update)
 /** -----------------------------------------------------------------------------------------------
  * Update the game engine by updating the GameClient and GameLogic singletons.
  */
+// TheSuperHackers @feature Stutter diagnosis instrumentation. When Options.ini contains
+// "StutterLog = yes", frames whose total wall time exceeds StutterLogThresholdMs (default 25)
+// are appended to StutterLog.txt in the user data folder with a phase breakdown, so frame
+// spikes during real play can be attributed to the client update, the logic update, or the
+// remainder of the loop (draw submission, present and frame pacing).
+static FILE* s_stutterLogFile = NULL;
+static Bool s_stutterLogChecked = FALSE;
+static Int64 s_stutterTicksPerMs = 0;
+static Int64 s_stutterThresholdTicks = 0;
+static Int64 s_stutterPrevFrameStart = 0;
+static Int64 s_stutterPrevClientTicks = 0;
+static Int64 s_stutterPrevLogicTicks = 0;
+
+static void stutterLogInit()
+{
+	s_stutterLogChecked = TRUE;
+	OptionPreferences prefs;
+	OptionPreferences::const_iterator it = prefs.find("StutterLog");
+	if (it == prefs.end() || stricmp(it->second.str(), "yes") != 0)
+		return;
+	Int thresholdMs = 25;
+	it = prefs.find("StutterLogThresholdMs");
+	if (it != prefs.end())
+	{
+		thresholdMs = atoi(it->second.str());
+		if (thresholdMs < 5) thresholdMs = 5;
+	}
+	LARGE_INTEGER freq;
+	if (!QueryPerformanceFrequency(&freq) || freq.QuadPart <= 0)
+		return;
+	s_stutterTicksPerMs = freq.QuadPart / 1000;
+	if (s_stutterTicksPerMs <= 0)
+		return;
+	s_stutterThresholdTicks = s_stutterTicksPerMs * thresholdMs;
+	AsciiString path = TheGlobalData->getPath_UserData();
+	path.concat("StutterLog.txt");
+	s_stutterLogFile = fopen(path.str(), "a");
+	if (s_stutterLogFile != NULL)
+		fprintf(s_stutterLogFile, "--- session start (threshold %dms) ---\n", thresholdMs);
+}
+
 void GameEngine::update()
 {
+	if (!s_stutterLogChecked)
+		stutterLogInit();
+
+	Int64 frameStart = 0;
+	if (s_stutterLogFile != NULL)
+	{
+		{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); frameStart = qpcTmp.QuadPart; }
+		if (s_stutterPrevFrameStart != 0)
+		{
+			const Int64 totalTicks = frameStart - s_stutterPrevFrameStart;
+			if (totalTicks > s_stutterThresholdTicks)
+			{
+				const Int64 clientMs = s_stutterPrevClientTicks / s_stutterTicksPerMs;
+				const Int64 logicMs = s_stutterPrevLogicTicks / s_stutterTicksPerMs;
+				const Int64 totalMs = totalTicks / s_stutterTicksPerMs;
+				fprintf(s_stutterLogFile, "frame=%u total=%dms client=%dms logic=%dms other=%dms\n",
+					TheGameLogic != NULL ? TheGameLogic->getFrame() : 0u,
+					(int)totalMs, (int)clientMs, (int)logicMs,
+					(int)(totalMs - clientMs - logicMs));
+				fflush(s_stutterLogFile);
+			}
+		}
+		s_stutterPrevFrameStart = frameStart;
+	}
+
 	USE_PERF_TIMER(GameEngine_update)
 	{
 		{
@@ -913,17 +979,39 @@ void GameEngine::update()
 			{
 				TheNetwork->UPDATE();
 			}
+
+			if (s_stutterLogFile != NULL)
+			{
+				Int64 afterClient;
+				{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); afterClient = qpcTmp.QuadPart; }
+				s_stutterPrevClientTicks = afterClient - frameStart;
+			}
 		}
 
 		// TheSuperHackers @info Ignores frozen time because the script engine needs updating in the logic update regardless.
 		if (canUpdateGameLogic(FramePacer::IgnoreFrozenTime))
 		{
+			Int64 beforeLogic = 0;
+			if (s_stutterLogFile != NULL)
+				{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); beforeLogic = qpcTmp.QuadPart; }
+
 			TheGameLogic->UPDATE();
+
+			if (s_stutterLogFile != NULL)
+			{
+				Int64 afterLogic;
+				{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); afterLogic = qpcTmp.QuadPart; }
+				s_stutterPrevLogicTicks = afterLogic - beforeLogic;
+			}
 
 			if (!TheFramePacer->isTimeFrozen())
 			{
 				TheGameClient->step();
 			}
+		}
+		else if (s_stutterLogFile != NULL)
+		{
+			s_stutterPrevLogicTicks = 0;
 		}
 	}
 }

@@ -110,6 +110,8 @@ protected:
 	UnsignedInt doTheDynamicLight(VERTEX_FORMAT *vb, VERTEX_FORMAT *vbMirror, Vector3*light, Vector3*normal, W3DDynamicLight *pLights[], Int numLights);
 	Int getXWithOrigin(Int x);
 	Int getYWithOrigin(Int x);
+	///true when the given vertex buffer tile is provably outside the camera frustum
+	Bool isTileOutsideFrustum(const FrustumClass &frustum, Int i, Int j);
 	///update vertex diffuse color for dynamic lights inside given rectangle
 	Int updateVBForLight(DX8VertexBufferClass *pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, W3DDynamicLight *pLights[], Int numLights);
 	Int updateVBForLightOptimized(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, W3DDynamicLight *pLights[], Int numLights);

@@ -119,6 +119,29 @@ int								DX8Wrapper::TextureBitDepth							= DEFAULT_TEXTURE_BIT_DEPTH;
 bool								DX8Wrapper::IsWindowed									= false;
 D3DFORMAT					DX8Wrapper::DisplayFormat	= D3DFMT_UNKNOWN;
 D3DMULTISAMPLE_TYPE DX8Wrapper::MultiSampleAntiAliasing	= DEFAULT_MSAA;
+bool DX8Wrapper::EnableVSync = true;
+
+// TheSuperHackers @tweak Caches the last light parameters applied to the device per light
+// slot, to skip redundant SetLight calls. Meshes sharing the same scene lights previously
+// re-applied identical light state on nearly every draw.
+static D3DLIGHT8 _AppliedLights[4];
+static bool _AppliedLightsValid[4];
+
+// TheSuperHackers @tweak Same dedup for the device material, the only per-draw
+// state without a redundancy check. Consecutive draws re-issue byte-identical
+// SetMaterial calls whenever the ambient light changes between objects.
+static D3DMATERIAL8 _AppliedMaterial;
+static bool _AppliedMaterialValid = false;
+
+void DX8Wrapper::Set_DX8_Material_Deduped(const D3DMATERIAL8* mat)
+{
+	if (!_AppliedMaterialValid || memcmp(&_AppliedMaterial, mat, sizeof(D3DMATERIAL8)) != 0)
+	{
+		_AppliedMaterial = *mat;
+		_AppliedMaterialValid = true;
+		Set_DX8_Material(mat);
+	}
+}
 
 // shader system additions KJM v
 DWORD								DX8Wrapper::Vertex_Shader								= 0;
@@ -417,6 +440,10 @@ void DX8Wrapper::Set_Default_Global_Render_States()
 
 void DX8Wrapper::Invalidate_Cached_Render_States()
 {
+	for (int lightIndex=0; lightIndex<4; ++lightIndex)
+		_AppliedLightsValid[lightIndex]=false;
+	_AppliedMaterialValid=false;
+
 	render_state_changed=0;
 
 	int a;
@@ -985,7 +1012,10 @@ bool DX8Wrapper::Set_Render_Device(int dev, int width, int height, int bits, int
 	_PresentParameters.EnableAutoDepthStencil = TRUE;				// Driver will attempt to match Z-buffer depth
 	_PresentParameters.Flags=0;											// We're not going to lock the backbuffer
 
-	_PresentParameters.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+	// TheSuperHackers @feature Disables VSync when requested. Direct3D 8 formally requires
+	// D3DPRESENT_INTERVAL_DEFAULT for windowed devices, but Wine and modern drivers accept
+	// D3DPRESENT_INTERVAL_IMMEDIATE in windowed mode as well.
+	_PresentParameters.FullScreen_PresentationInterval = EnableVSync ? D3DPRESENT_INTERVAL_DEFAULT : D3DPRESENT_INTERVAL_IMMEDIATE;
 	_PresentParameters.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
 	/*
@@ -2264,10 +2294,16 @@ void DX8Wrapper::Apply_Render_State_Changes()
 					}
 #endif
 
-					Set_DX8_Light(index,&render_state.Lights[index]);
+					if (!_AppliedLightsValid[index] || memcmp(&_AppliedLights[index], &render_state.Lights[index], sizeof(D3DLIGHT8)) != 0)
+					{
+						Set_DX8_Light(index,&render_state.Lights[index]);
+						_AppliedLights[index] = render_state.Lights[index];
+						_AppliedLightsValid[index] = true;
+					}
 				}
 				else {
 					Set_DX8_Light(index,nullptr);
+					_AppliedLightsValid[index] = false;
 					SNAPSHOT_SAY((" clearing light to null"));
 				}
 			}

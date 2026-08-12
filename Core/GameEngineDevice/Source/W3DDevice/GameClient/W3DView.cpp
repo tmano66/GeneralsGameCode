@@ -2236,7 +2236,7 @@ void W3DView::setDefaultView(Real pitch, Real angle, Real maxHeight)
 	// MDC - we no longer want to rotate maps (design made all of them right to begin with)
 	//	m_defaultAngle = angle * M_PI/180.0f;
 	setDefaultPitch(pitch);
-	m_maxHeightAboveGround = TheGlobalData->m_maxCameraHeight*maxHeight;
+	m_maxHeightAboveGround = TheGlobalData->m_maxCameraHeight * TheGlobalData->m_maxCameraHeightScale * maxHeight;
 	if (m_minHeightAboveGround > m_maxHeightAboveGround)
 		m_maxHeightAboveGround = m_minHeightAboveGround;
 }
@@ -3728,13 +3728,36 @@ bool W3DView::getDesiredTerrainDrawSize(ICoord2D &dimensions) const
 		// and uses terrain oversize if it needs to enlarge.
 		dimensions.x = WorldHeightMap::NORMAL_DRAW_WIDTH;
 		dimensions.y = WorldHeightMap::NORMAL_DRAW_HEIGHT;
-		return true;
+	}
+	else
+	{
+		// TheSuperHackers @tweak xezon 31/12/2025 Increases visible terrain area when lowering the camera pitch.
+		// Note: The default camera pitch in Generals was 37.5, which we prefer to keep the normal draw size for.
+		dimensions.x = WorldHeightMap::LOW_ANGLE_DRAW_WIDTH;
+		dimensions.y = WorldHeightMap::LOW_ANGLE_DRAW_HEIGHT;
 	}
 
-	// TheSuperHackers @tweak xezon 31/12/2025 Increases visible terrain area when lowering the camera pitch.
-	// Note: The default camera pitch in Generals was 37.5, which we prefer to keep the normal draw size for.
-	dimensions.x = WorldHeightMap::LOW_ANGLE_DRAW_WIDTH;
-	dimensions.y = WorldHeightMap::LOW_ANGLE_DRAW_HEIGHT;
+	// TheSuperHackers @feature Grows the terrain draw window when the camera is raised beyond the
+	// original maximum camera height, so that the terrain does not end visibly in a square when
+	// zooming far out. Grows in whole steps to avoid resizing the terrain buffers every frame.
+	// Growing is immediate so the terrain edge never becomes visible; shrinking uses hysteresis
+	// (10% of the max camera height of slack) because m_currentHeightAboveGround varies with the
+	// terrain height under the camera pivot and would otherwise thrash the terrain buffers when
+	// scrolling near a step boundary. A full resize costs two full relights of up to ~1M vertices.
+	if (TheGlobalData && TheGlobalData->m_maxCameraHeight > 0.0f)
+	{
+		const Real ratio = m_currentHeightAboveGround / TheGlobalData->m_maxCameraHeight;
+		Int steps = 0;
+		if (ratio > 1.0f)
+			steps = (Int)ceil(ratio) - 1;
+		static Int s_prevSteps = 0;
+		if (steps < s_prevSteps && ratio > (Real)s_prevSteps - 0.1f)
+			steps = s_prevSteps;
+		s_prevSteps = steps;
+		dimensions.x += (WorldHeightMap::NORMAL_DRAW_WIDTH - 1) * steps;
+		dimensions.y += (WorldHeightMap::NORMAL_DRAW_HEIGHT - 1) * steps;
+	}
+
 	return true;
 }
 

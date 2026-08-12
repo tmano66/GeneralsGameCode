@@ -272,6 +272,9 @@ public:
 	static void					Set_MSAA_Mode(MultiSampleModeEnum mode);
 	static MultiSampleModeEnum Get_MSAA_Mode();
 
+	static void					Set_VSync_Enabled(bool enable);
+	static bool					Get_VSync_Enabled();
+
 	static void					Set_Mesh_Draw_Mode (MeshDrawModeEnum mode)	{ MeshDrawMode = mode; }
 	static MeshDrawModeEnum Get_Mesh_Draw_Mode ()								{ return (MeshDrawMode); }
 

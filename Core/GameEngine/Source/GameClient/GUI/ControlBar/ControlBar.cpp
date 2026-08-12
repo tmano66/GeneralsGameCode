@@ -1448,6 +1448,19 @@ void ControlBar::update()
 		hideBuildTooltipLayout();
 	}*/
 
+	// TheSuperHackers @tweak The full command UI evaluation below scans whole object lists and
+	// only depends on logic state (money, cooldowns, production queues), which changes at most
+	// once per logic frame (30/s). At high render frame rates this ran up to 6x more often than
+	// needed. m_UIDirty covers selection changes and other UI-affecting events within a frame.
+	// This restores the retail cadence of exactly one evaluation per logic frame.
+	{
+		static UnsignedInt s_lastEvalFrame = 0xFFFFFFFF;
+		const UnsignedInt currentFrame = TheGameLogic->getFrame();
+		if (currentFrame == s_lastEvalFrame && !m_UIDirty)
+			return;
+		s_lastEvalFrame = currentFrame;
+	}
+
 	updateSpecialPowerShortcut();
 	// if we're an observer, don't do the complete update
 	if( m_isObserverCommandBar)

@@ -54,6 +54,8 @@
 #include <WW3D2/texture.h>
 #include <WWMath/tri.h>
 #include <WWMath/colmath.h>
+#include <WWMath/aabox.h>
+#include <WWMath/frustum.h>
 #include <WW3D2/coltest.h>
 #include <WW3D2/rinfo.h>
 #include <WW3D2/camera.h>
@@ -103,6 +105,12 @@ HeightMapRenderObjClass *TheHeightMap = nullptr;
 	ShaderClass::ALPHATEST_DISABLE, ShaderClass::CULL_MODE_ENABLE, ShaderClass::DETAILCOLOR_SCALE, ShaderClass::DETAILALPHA_DISABLE) )
 
 static ShaderClass detailOpaqueShader(SC_DETAIL_BLEND);
+
+// TheSuperHackers @tweak When resizing the terrain draw window, the initial full vertex
+// fill inside initHeightData (which runs without a lights iterator) is deferred, because
+// updateCenter performs the same full update with the real lights immediately afterwards.
+// This halves the cost of a draw window resize. Render path is single threaded.
+static Bool s_deferInitialUpdateBlock = FALSE;
 
 #define DEFAULT_MAX_FRAME_EXTRABLEND_TILES		256	//default number of terrain tiles rendered per call (must fit in one VB)
 #define DEFAULT_MAX_MAP_EXTRABLEND_TILES		2048	//default size of array allocated to hold all map extra blend tiles.
@@ -1197,7 +1205,9 @@ void HeightMapRenderObjClass::setTerrainDrawSize(Int width, Int height)
 		m_shroud->reset();
 	//delete m_shroud;
 	//m_shroud = nullptr;
+	s_deferInitialUpdateBlock = TRUE;
 	initHeightData(m_map->getDrawWidth(), m_map->getDrawHeight(), m_map, nullptr, FALSE);
+	s_deferInitialUpdateBlock = FALSE;
 	scheduleFullUpdate();
 }
 
@@ -1333,7 +1343,8 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 		//go with a preset material for now.
 	}
 
-	updateBlock(0,0,x-1,y-1,pMap,pLightsIterator);
+	if (!s_deferInitialUpdateBlock)
+		updateBlock(0,0,x-1,y-1,pMap,pLightsIterator);
 
 	return 0;
 }
@@ -2030,6 +2041,9 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 		for (j=0; j<m_numVBTilesY; j++)
 			for (i=0; i<m_numVBTilesX; i++)
 			{
+				if (isTileOutsideFrustum(rinfo.Camera.Get_Frustum(), i, j))
+					continue;
+
 				DX8Wrapper::Set_Vertex_Buffer(getVertexBufferTile(i, j));
 #ifdef PRE_TRANSFORM_VERTEX
 				if (m_xformedVertexBuffer && pass==0) {
@@ -2141,6 +2155,37 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 
 
 ///Performs additional terrain rendering pass, blending in the black shroud texture.
+
+//-----------------------------------------------------------------------------
+// TheSuperHackers @tweak Frustum culling for whole terrain vertex buffer tiles.
+// The render loops previously issued a draw call for every tile of the draw
+// window in every pass, even for tiles entirely outside the camera frustum.
+// With the zoomed out draw window this is a large number of wasted draw calls.
+// Coordinate math matches the vertex placement in updateVB and the dynamic
+// light tile intersection code above. Z bounds are the provable height range
+// of any terrain vertex (UnsignedByte * MAP_HEIGHT_SCALE). Returns true when
+// the tile is provably outside the frustum. Wrapped tiles draw conservatively.
+//-----------------------------------------------------------------------------
+Bool HeightMapRenderObjClass::isTileOutsideFrustum(const FrustumClass &frustum, Int i, Int j)
+{
+	const Int yMin = j*VERTEX_BUFFER_TILE_LENGTH;
+	const Int yCoordMin = getYWithOrigin(yMin)+m_map->getDrawOrgY()-m_map->getBorderSizeInline();
+	const Int yCoordMax = getYWithOrigin(yMin+VERTEX_BUFFER_TILE_LENGTH-1)+m_map->getDrawOrgY()+1-m_map->getBorderSizeInline();
+	if (yCoordMax <= yCoordMin)
+		return false;
+
+	const Int xMin = i*VERTEX_BUFFER_TILE_LENGTH;
+	const Int xCoordMin = getXWithOrigin(xMin)+m_map->getDrawOrgX()-m_map->getBorderSizeInline();
+	const Int xCoordMax = getXWithOrigin(xMin+VERTEX_BUFFER_TILE_LENGTH-1)+m_map->getDrawOrgX()+1-m_map->getBorderSizeInline();
+	if (xCoordMax <= xCoordMin)
+		return false;
+
+	Vector3 center((xCoordMin+xCoordMax)*0.5f*MAP_XY_FACTOR, (yCoordMin+yCoordMax)*0.5f*MAP_XY_FACTOR, 128.0f*MAP_HEIGHT_SCALE);
+	Vector3 extent((xCoordMax-xCoordMin)*0.5f*MAP_XY_FACTOR, (yCoordMax-yCoordMin)*0.5f*MAP_XY_FACTOR, 128.0f*MAP_HEIGHT_SCALE);
+	AABoxClass box(center, extent);
+	return CollisionMath::Overlap_Test(frustum, box) == CollisionMath::OUTSIDE;
+}
+
 void HeightMapRenderObjClass::renderTerrainPass(CameraClass *pCamera)
 {
 	DX8Wrapper::Set_Transform(D3DTS_WORLD,Matrix3D(true));
@@ -2149,9 +2194,14 @@ void HeightMapRenderObjClass::renderTerrainPass(CameraClass *pCamera)
 
 	DX8Wrapper::Set_Index_Buffer(m_indexBuffer,0);
 
+	const FrustumClass &terrainPassFrustum = pCamera->Get_Frustum();
+
 	for (Int j=0; j<m_numVBTilesY; j++)
 		for (Int i=0; i<m_numVBTilesX; i++)
 		{
+			if (isTileOutsideFrustum(terrainPassFrustum, i, j))
+				continue;
+
 			DX8Wrapper::Set_Vertex_Buffer(getVertexBufferTile(i, j));
 #ifdef PRE_TRANSFORM_VERTEX
 			if (m_xformedVertexBuffer && pass==0) {
