@@ -449,8 +449,18 @@ void GameClient::init()
 
 //-------------------------------------------------------------------------------------------------
 /** Reset the game client for a new game */
+// TheSuperHackers @tweak The per-drawable shroud and ghost-object status refresh below only
+// depends on logic state, which changes once per logic frame. At high render frame rates the
+// refresh previously recomputed identical values several times per logic frame for every
+// drawable. Reset in GameClient::reset() so loads always force a refresh.
+static UnsignedInt s_lastShroudRefreshFrame = 0xFFFFFFFF;
+static Int s_lastShroudRefreshPlayer = -1;
+
 void GameClient::reset()
 {
+	s_lastShroudRefreshFrame = 0xFFFFFFFF;
+	s_lastShroudRefreshPlayer = -1;
+
 	Drawable *draw, *nextDraw;
 //	m_drawableHash.clear();
 //	m_drawableHash.resize(DRAWABLE_HASH_SIZE);
@@ -605,10 +615,18 @@ void GameClient::update()
 		Int numNonLocalPlayers = 0;
 		Int nonLocalPlayerIndices[MAX_PLAYER_COUNT];
 
+		const UnsignedInt shroudLogicFrame = TheGameLogic->getFrame();
+		const Bool refreshShroud = (shroudLogicFrame != s_lastShroudRefreshFrame) || (localPlayerIndex != s_lastShroudRefreshPlayer);
+		if (refreshShroud)
+		{
+			s_lastShroudRefreshFrame = shroudLogicFrame;
+			s_lastShroudRefreshPlayer = localPlayerIndex;
+		}
+
 #if ENABLE_CONFIGURABLE_SHROUD
-		if (TheGlobalData->m_shroudOn)
+		if (refreshShroud && TheGlobalData->m_shroudOn)
 #else
-		if (true)
+		if (refreshShroud)
 #endif
 		{
 			if (TheGhostObjectManager->trackAllPlayers())
@@ -636,9 +654,9 @@ void GameClient::update()
 		{	// update() could free the Drawable, so go ahead and grab 'next'
 			Drawable* next = draw->getNextDrawable();
 #if ENABLE_CONFIGURABLE_SHROUD
-			if (TheGlobalData->m_shroudOn)
+			if (refreshShroud && TheGlobalData->m_shroudOn)
 #else
-			if (true)
+			if (refreshShroud)
 #endif
 			{
 				//immobile objects need to take snapshots whenever they become fogged
