@@ -305,6 +305,17 @@ Bool OptionPreferences::getVSyncEnabled() const
 	return (stricmp(it->second.str(), "no") != 0);
 }
 
+Bool OptionPreferences::getPreloadAssetsEnabled() const
+{
+	OptionPreferences::const_iterator it = find("PreloadAssets");
+	if (it == end())
+		return FALSE;
+
+	// TheSuperHackers @feature Preload faction models, damage states and particle textures
+	// during map load, eliminating first-sight asset load hitches during the match.
+	return (stricmp(it->second.str(), "yes") == 0);
+}
+
 Bool OptionPreferences::getDrawScrollAnchor()
 {
 	OptionPreferences::const_iterator it = find("DrawScrollAnchor");

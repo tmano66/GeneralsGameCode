@@ -1213,6 +1213,8 @@ void GlobalData::parseGameDataDefinition( INI* ini )
 	TheWritableGlobalData->m_maxCameraHeightScale = optionPref.getMaxCameraHeightScale();
 	TheWritableGlobalData->m_framesPerSecondLimit = optionPref.getFramesPerSecondLimit();
 	TheWritableGlobalData->m_vsyncEnabled = optionPref.getVSyncEnabled();
+	if (optionPref.getPreloadAssetsEnabled())
+		TheWritableGlobalData->m_preloadAssets = TRUE;
 	TheWritableGlobalData->m_drawScrollAnchor = optionPref.getDrawScrollAnchor();
 	TheWritableGlobalData->m_moveScrollAnchor = optionPref.getMoveScrollAnchor();
 	TheWritableGlobalData->m_defaultIP = optionPref.getLANIPAddress();

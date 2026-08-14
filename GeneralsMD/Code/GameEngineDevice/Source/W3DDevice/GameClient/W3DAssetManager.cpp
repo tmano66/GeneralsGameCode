@@ -225,7 +225,29 @@ TextureClass *W3DAssetManager::Get_Texture(
 	*/
 	if (!tex)
 	{
+		// TheSuperHackers @feature Trace first-use texture creation to the stutter log when enabled.
+		extern FILE* TheStutterLogFile;
+		LARGE_INTEGER texLoadStart;
+		texLoadStart.QuadPart = 0;
+		if (TheStutterLogFile != NULL)
+			QueryPerformanceCounter(&texLoadStart);
+
 		tex = NEW_REF(TextureClass, (lower_case_name, nullptr, mip_level_count, texture_format, allow_compression));
+
+		if (TheStutterLogFile != NULL && texLoadStart.QuadPart != 0)
+		{
+			LARGE_INTEGER texLoadEnd, texFreq;
+			QueryPerformanceCounter(&texLoadEnd);
+			if (QueryPerformanceFrequency(&texFreq) && texFreq.QuadPart > 0)
+			{
+				const int texMs = (int)((texLoadEnd.QuadPart - texLoadStart.QuadPart) * 1000 / texFreq.QuadPart);
+				if (texMs >= 5)
+				{
+					fprintf(TheStutterLogFile, "  asset-load TX: %s %dms\n", lower_case_name, texMs);
+					fflush(TheStutterLogFile);
+				}
+			}
+		}
 		TextureHash.Insert(tex->Get_Texture_Name(),tex);
 //		if (TheGlobalData->m_preloadAssets)
 //		{

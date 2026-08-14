@@ -77,6 +77,7 @@ public:
 	Real getMaxCameraHeightScale() const;
 	Int getFramesPerSecondLimit() const;
 	Bool getVSyncEnabled() const;
+	Bool getPreloadAssetsEnabled() const;
 	Bool getDrawScrollAnchor();
 	Bool getMoveScrollAnchor();
 	Bool getCursorCaptureEnabledInWindowedGame() const;

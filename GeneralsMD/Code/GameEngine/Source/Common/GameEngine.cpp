@@ -898,7 +898,7 @@ DECLARE_PERF_TIMER(GameEngine_update)
 // are appended to StutterLog.txt in the user data folder with a phase breakdown, so frame
 // spikes during real play can be attributed to the client update, the logic update, or the
 // remainder of the loop (draw submission, present and frame pacing).
-static FILE* s_stutterLogFile = NULL;
+extern FILE* TheStutterLogFile; // defined in WW3D2 assetmgr.cpp, opened here at startup
 static Bool s_stutterLogChecked = FALSE;
 static Int64 s_stutterTicksPerMs = 0;
 static Int64 s_stutterThresholdTicks = 0;
@@ -929,9 +929,9 @@ static void stutterLogInit()
 	s_stutterThresholdTicks = s_stutterTicksPerMs * thresholdMs;
 	AsciiString path = TheGlobalData->getPath_UserData();
 	path.concat("StutterLog.txt");
-	s_stutterLogFile = fopen(path.str(), "a");
-	if (s_stutterLogFile != NULL)
-		fprintf(s_stutterLogFile, "--- session start (threshold %dms) ---\n", thresholdMs);
+	TheStutterLogFile = fopen(path.str(), "a");
+	if (TheStutterLogFile != NULL)
+		fprintf(TheStutterLogFile, "--- session start (threshold %dms) ---\n", thresholdMs);
 }
 
 void GameEngine::update()
@@ -940,7 +940,7 @@ void GameEngine::update()
 		stutterLogInit();
 
 	Int64 frameStart = 0;
-	if (s_stutterLogFile != NULL)
+	if (TheStutterLogFile != NULL)
 	{
 		{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); frameStart = qpcTmp.QuadPart; }
 		if (s_stutterPrevFrameStart != 0)
@@ -951,11 +951,11 @@ void GameEngine::update()
 				const Int64 clientMs = s_stutterPrevClientTicks / s_stutterTicksPerMs;
 				const Int64 logicMs = s_stutterPrevLogicTicks / s_stutterTicksPerMs;
 				const Int64 totalMs = totalTicks / s_stutterTicksPerMs;
-				fprintf(s_stutterLogFile, "frame=%u total=%dms client=%dms logic=%dms other=%dms\n",
+				fprintf(TheStutterLogFile, "frame=%u total=%dms client=%dms logic=%dms other=%dms\n",
 					TheGameLogic != NULL ? TheGameLogic->getFrame() : 0u,
 					(int)totalMs, (int)clientMs, (int)logicMs,
 					(int)(totalMs - clientMs - logicMs));
-				fflush(s_stutterLogFile);
+				fflush(TheStutterLogFile);
 			}
 		}
 		s_stutterPrevFrameStart = frameStart;
@@ -980,7 +980,7 @@ void GameEngine::update()
 				TheNetwork->UPDATE();
 			}
 
-			if (s_stutterLogFile != NULL)
+			if (TheStutterLogFile != NULL)
 			{
 				Int64 afterClient;
 				{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); afterClient = qpcTmp.QuadPart; }
@@ -992,12 +992,12 @@ void GameEngine::update()
 		if (canUpdateGameLogic(FramePacer::IgnoreFrozenTime))
 		{
 			Int64 beforeLogic = 0;
-			if (s_stutterLogFile != NULL)
+			if (TheStutterLogFile != NULL)
 				{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); beforeLogic = qpcTmp.QuadPart; }
 
 			TheGameLogic->UPDATE();
 
-			if (s_stutterLogFile != NULL)
+			if (TheStutterLogFile != NULL)
 			{
 				Int64 afterLogic;
 				{ LARGE_INTEGER qpcTmp; QueryPerformanceCounter(&qpcTmp); afterLogic = qpcTmp.QuadPart; }
@@ -1009,7 +1009,7 @@ void GameEngine::update()
 				TheGameClient->step();
 			}
 		}
-		else if (s_stutterLogFile != NULL)
+		else if (TheStutterLogFile != NULL)
 		{
 			s_stutterPrevLogicTicks = 0;
 		}

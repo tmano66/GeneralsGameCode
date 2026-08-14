@@ -617,9 +617,20 @@ void WW3DAssetManager::Create_Asset_List(DynamicVectorClass<StringClass> & model
  * HISTORY:                                                                                    *
  *   10/22/98   BMG : Created.                                                                 *
  *=============================================================================================*/
+// TheSuperHackers @feature Trace on-demand 3D asset loads to the stutter log when enabled,
+// so first-sight model loads during a match can be attributed by name. Defined here in the
+// library so tools that link ww3d2 without the game engine resolve the symbol; the game
+// engine opens the file and assigns the handle at startup.
+FILE* TheStutterLogFile = NULL;
+
 bool WW3DAssetManager::Load_3D_Assets( const char * filename )
 {
 	bool result = false;
+
+	LARGE_INTEGER loadStart;
+	loadStart.QuadPart = 0;
+	if (TheStutterLogFile != NULL)
+		QueryPerformanceCounter(&loadStart);
 
 	FileClass * file = _TheFileFactory->Get_File( filename );
 	if ( file ) {
@@ -629,6 +640,21 @@ bool WW3DAssetManager::Load_3D_Assets( const char * filename )
 			WWDEBUG_SAY(("Missing asset '%s'.", filename));
 		}
 		_TheFileFactory->Return_File( file );
+	}
+
+	if (TheStutterLogFile != NULL && loadStart.QuadPart != 0)
+	{
+		LARGE_INTEGER loadEnd, freq;
+		QueryPerformanceCounter(&loadEnd);
+		if (QueryPerformanceFrequency(&freq) && freq.QuadPart > 0)
+		{
+			const int ms = (int)((loadEnd.QuadPart - loadStart.QuadPart) * 1000 / freq.QuadPart);
+			if (ms >= 5)
+			{
+				fprintf(TheStutterLogFile, "  asset-load W3D: %s %dms\n", filename, ms);
+				fflush(TheStutterLogFile);
+			}
+		}
 	}
 
 	return result;
