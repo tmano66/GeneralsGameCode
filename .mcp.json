@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "generals-mapgen": {
+      "command": "python3",
+      "args": ["mapgen-mcp/server.py"]
+    }
+  }
+}

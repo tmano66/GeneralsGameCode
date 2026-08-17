@@ -1,0 +1,930 @@
+{
+"AsphaltType1": {
+"numTiles": 4,
+"width": 2
+},
+"AsphaltType2": {
+"numTiles": 4,
+"width": 2
+},
+"AsphaltType3": {
+"numTiles": 4,
+"width": 2
+},
+"BridgeAsphaltBlend": {
+"numTiles": 1,
+"width": 1
+},
+"CliffLargeType1": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType10": {
+"numTiles": 16,
+"width": 4
+},
+"CliffLargeType11": {
+"numTiles": 100,
+"width": 10
+},
+"CliffLargeType12": {
+"numTiles": 100,
+"width": 10
+},
+"CliffLargeType13": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType1snow": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType3": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType3b": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType4": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType6": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType6b": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType7": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType8": {
+"numTiles": 36,
+"width": 6
+},
+"CliffLargeType9": {
+"numTiles": 36,
+"width": 6
+},
+"CliffMediumType1": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType10": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType10b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType11": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType12": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType13": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType13b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType15": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType15b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType15snow": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType16": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType17": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType17b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType17bsnowy": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType18": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType19": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType2": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType20": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType21": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType22": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType23": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType24b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType3": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType4": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType5": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType5b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType6b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType6c": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType6snow": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType8": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType8b": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType9": {
+"numTiles": 16,
+"width": 4
+},
+"CliffMediumType9b": {
+"numTiles": 16,
+"width": 4
+},
+"Cobble01": {
+"numTiles": 16,
+"width": 4
+},
+"Cobble03": {
+"numTiles": 16,
+"width": 4
+},
+"Cobble04": {
+"numTiles": 100,
+"width": 10
+},
+"CobblestoneType1": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteMediumType1": {
+"numTiles": 16,
+"width": 4
+},
+"ConcreteMediumType1Snow": {
+"numTiles": 16,
+"width": 4
+},
+"ConcreteType1": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteType2": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteType3": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteType4": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteType5": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteType6": {
+"numTiles": 4,
+"width": 2
+},
+"ConcreteType7": {
+"numTiles": 4,
+"width": 2
+},
+"CropsType1": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType1": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType10": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType11": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType12": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType13": {
+"numTiles": 4,
+"width": 2
+},
+"DirtMediumType14": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType15Snow": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType2": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType3": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType4": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType5": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType7": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType8": {
+"numTiles": 16,
+"width": 4
+},
+"DirtMediumType9": {
+"numTiles": 16,
+"width": 4
+},
+"DirtSnowType1": {
+"numTiles": 16,
+"width": 4
+},
+"DirtType1": {
+"numTiles": 4,
+"width": 2
+},
+"DirtType2": {
+"numTiles": 4,
+"width": 2
+},
+"DirtType3": {
+"numTiles": 4,
+"width": 2
+},
+"Grass02": {
+"numTiles": 100,
+"width": 10
+},
+"GrassLargeType1": {
+"numTiles": 36,
+"width": 6
+},
+"GrassLargeType1Snow": {
+"numTiles": 36,
+"width": 6
+},
+"GrassLargeType2": {
+"numTiles": 36,
+"width": 6
+},
+"GrassMediumType1": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType10": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType10b": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType11": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType11b": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType12": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType12Leaves": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType13": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType13Leaves": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType13Light": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType14": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType15": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType16": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType17": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType18": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType19": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType2": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType20": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType21": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType22": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType23": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType23brown": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType24": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType25": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType26": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType27": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType27brown": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType27olive": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType28": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType29": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType3": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType30": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType31": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType32": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType33": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType34": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType35": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType36": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37a": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37b": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37c": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37d": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37e": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37f": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType37g": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType38a": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType4": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType5": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType6": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType7": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType8": {
+"numTiles": 16,
+"width": 4
+},
+"GrassMediumType9": {
+"numTiles": 16,
+"width": 4
+},
+"GrassType1": {
+"numTiles": 4,
+"width": 2
+},
+"GreeceSand01": {
+"numTiles": 4,
+"width": 2
+},
+"ParkingLotType1a": {
+"numTiles": 4,
+"width": 2
+},
+"ParkingLotType1b": {
+"numTiles": 4,
+"width": 2
+},
+"ParkingLotType1c": {
+"numTiles": 4,
+"width": 2
+},
+"ParkingLotType1d": {
+"numTiles": 4,
+"width": 2
+},
+"RocksMediumType1": {
+"numTiles": 16,
+"width": 4
+},
+"RocksMediumType1Snow": {
+"numTiles": 16,
+"width": 4
+},
+"RocksMediumType1Snow2": {
+"numTiles": 16,
+"width": 4
+},
+"RocksType1": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType2": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType3": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType3blue": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType4": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType5": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType6": {
+"numTiles": 4,
+"width": 2
+},
+"RocksType7": {
+"numTiles": 4,
+"width": 2
+},
+"SandLargeType1": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType2": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType2Grassy": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3Grassy": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3Light": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3Rocky&Grassy": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3Rocky1": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3Rocky2": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType3Rocky3": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType4": {
+"numTiles": 36,
+"width": 6
+},
+"SandLargeType4Grassy": {
+"numTiles": 36,
+"width": 6
+},
+"SandMediumType1": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType10": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType10brown": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType11": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType12Grassy": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13b": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13c": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13d": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13grassy": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13grassy2": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13grassy3": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType13grassy4": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType14light": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType2": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType3": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType4": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType5": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType5b": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType5c": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType5grassy": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType6": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType6Light": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType7": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType7Grassy": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType7GrassyLight": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType7Light": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType7Rocky": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType8": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9Snow": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9Snow2": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9Snow3": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9b": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9blue": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9blue2": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9blue3": {
+"numTiles": 16,
+"width": 4
+},
+"SandMediumType9blue4": {
+"numTiles": 16,
+"width": 4
+},
+"SandToxicSpill1": {
+"numTiles": 4,
+"width": 2
+},
+"SandToxicSpill2": {
+"numTiles": 4,
+"width": 2
+},
+"SandToxicSpill3": {
+"numTiles": 4,
+"width": 2
+},
+"SandType1": {
+"numTiles": 4,
+"width": 2
+},
+"SandType1dark": {
+"numTiles": 4,
+"width": 2
+},
+"SandType1darker": {
+"numTiles": 4,
+"width": 2
+},
+"SandType2": {
+"numTiles": 4,
+"width": 2
+},
+"SandType2wavy": {
+"numTiles": 4,
+"width": 2
+},
+"SandType3": {
+"numTiles": 4,
+"width": 2
+},
+"SandType3wavy": {
+"numTiles": 4,
+"width": 2
+},
+"SandType3wet": {
+"numTiles": 4,
+"width": 2
+},
+"SandType4": {
+"numTiles": 4,
+"width": 2
+},
+"SandType6": {
+"numTiles": 16,
+"width": 4
+},
+"SnowLargeType1": {
+"numTiles": 36,
+"width": 6
+},
+"SnowType1": {
+"numTiles": 4,
+"width": 2
+},
+"SnowType2": {
+"numTiles": 4,
+"width": 2
+},
+"SnowType3": {
+"numTiles": 4,
+"width": 2
+},
+"SnowType4": {
+"numTiles": 4,
+"width": 2
+},
+"SnowType5": {
+"numTiles": 16,
+"width": 4
+},
+"SnowType6": {
+"numTiles": 16,
+"width": 4
+},
+"SnowType7": {
+"numTiles": 16,
+"width": 4
+},
+"SnowType7b": {
+"numTiles": 16,
+"width": 4
+},
+"SnowType7c": {
+"numTiles": 16,
+"width": 4
+},
+"WoodBridgeBlend1": {
+"numTiles": 1,
+"width": 1
+},
+"WoodType1": {
+"numTiles": 4,
+"width": 2
+},
+"WoodType1small": {
+"numTiles": 4,
+"width": 2
+}
+}

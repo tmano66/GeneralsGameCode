@@ -3,6 +3,7 @@
 !.editorconfig
 !.gitignore
 !.gitattributes
+!.mcp.json
 !.github
 !.gitmodules
 
